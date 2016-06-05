@@ -1,0 +1,17 @@
+
+body {
+    color: #000;
+    font-family: Monospace;
+    font-size: 13px;
+    margin: 0px;
+    overflow: hidden;
+    background-image: linear-gradient(to bottom right, #C644FC 25%, #5856D6 100%);
+}
+
+.dg {
+    display: none;
+
+    @media (min-width: 768px) {
+        display: block;
+    }
+}
