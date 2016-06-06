@@ -4,10 +4,11 @@ import explodeModifier from './explodeModifier';
 export default class Blob {
     constructor(gui) {
         this.config = {
-            size: 80,
-            speed: 500,
+            speed: 800,
             radius: 400,
-            detail: 2,
+            detail: 4,
+            min: 350,
+            max: 100,
         };
 
         const geometry = new THREE.IcosahedronGeometry(
@@ -21,36 +22,20 @@ export default class Blob {
             specular: 0xffffff,
             shininess: 30,
             shading: THREE.FlatShading,
-            side: THREE.DoubleSide,
+            // shading: THREE.SmoothShading,
+            // side: THREE.DoubleSide,
             // wireframe: true,
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.set(0, 0, 0);
-        this.warpVector = new THREE.Vector3(0, 200, 0);
         this.initGui(gui);
-
-        const { speed, radius } = this.config;
-        for (let i = 0; i < this.mesh.geometry.vertices.length; i += 4) {
-            const A = this.mesh.geometry.vertices[i + 0];
-            const B = this.mesh.geometry.vertices[i + 1];
-            const C = this.mesh.geometry.vertices[i + 2];
-            const D = this.mesh.geometry.vertices[i + 3];
-            const scale = 1 + 0.5 * (radius * 2);
-            A.normalize().multiplyScalar(scale);
-            B.normalize().multiplyScalar(scale);
-            C.normalize().multiplyScalar(scale);
-            D.normalize().multiplyScalar(radius - 50);
-            // D.normalize().multiplyScalar(radius / 2); // animate between 0 and radius * 2
-        }
-
-
     }
 
     initGui(gui) {
         const folder = gui.addFolder('Sphere');
-        folder.add(this.config, 'size', 80, 200)
-            .onChange(c => this.config.size = Number(c));
+        folder.add(this.config, 'min', 0, 400);
+        folder.add(this.config, 'max', 0, 800);
         folder.add(this.config, 'speed', 1, 1000);
     }
 
@@ -60,24 +45,14 @@ export default class Blob {
     }
 
     update(timeStamp) {
-        // const { speed, radius } = this.config;
-        // for (let i = 0; i < this.mesh.geometry.vertices.length; i += 4) {
-        //     // const A = this.mesh.geometry.vertices[i + 0];
-        //     // const B = this.mesh.geometry.vertices[i + 1];
-        //     // const C = this.mesh.geometry.vertices[i + 2];
-        //     const D = this.mesh.geometry.vertices[i + 3];
-        //
-        //     const radian = radius * (Math.sin((timeStamp / (speed * 8))));
-        //     // console.log(radian);
-        //     // A.normalize().multiplyScalar(scale);
-        //     // B.normalize().multiplyScalar(scale);
-        //     // C.normalize().multiplyScalar(scale);
-        //     D.normalize().multiplyScalar(radian);
-        // }
-        // // this.mesh.geometry.computeVertexNormals();
-        // // this.mesh.geometry.computeFaceNormals();
-        // this.mesh.geometry.verticesNeedUpdate = true;
-        // // this.mesh.geometry.elementsNeedUpdate = true;
-        // // this.mesh.geometry.normalsNeedUpdate = true;
+        const { speed, min, max } = this.config;
+
+        for (let i = 0; i < this.mesh.geometry.vertices.length; i += 4) {
+            const wave = min + Math.abs((Math.sin(i + (timeStamp / speed))) * max);
+            const D = this.mesh.geometry.vertices[i + 3];
+            D.normalize().multiplyScalar(wave);
+        }
+
+        this.mesh.geometry.verticesNeedUpdate = true;
     }
 }

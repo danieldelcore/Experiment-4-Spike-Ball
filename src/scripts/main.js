@@ -35,11 +35,11 @@ class Main {
             'onResize');
 
         this.conf = {
-            hemisphereLightColor: 0xe9ff4a,
-            hemisphereLightColor2: 0x0bd318,
-            hemisphereLightIntensity: 0,
+            hemisphereLightColor: 0x00ffb3,
+            hemisphereLightColor2: 0x4b2ecf,
+            hemisphereLightIntensity: 1,
             directionalLightColor: 0xffffff,
-            directionalLightIntensity: 0,
+            directionalLightIntensity: 0.1,
         };
 
         // Renderer
@@ -85,14 +85,6 @@ class Main {
             this.conf.hemisphereLightColor2,
             this.conf.hemisphereLightIntensity);
         this.hemisphereLight.position.set(-20, 20, 30);
-
-        const light = new THREE.PointLight(0xffffff);
-        light.position.set(0, 1000, 1000);
-        this.scene.add(light);
-
-        const light1 = new THREE.PointLight(0xffffff);
-        light1.position.set(0, -1000, 1000);
-        this.scene.add(light1);
 
         // Pièce de résistance
         this.blob = new Blob(gui);

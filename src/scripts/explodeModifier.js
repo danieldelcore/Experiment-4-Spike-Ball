@@ -3,13 +3,6 @@
  * Find the original here: http://threejs.org/examples/js/modifiers/ExplodeModifier.js
  */
 
-/**
- * Make all faces use unique vertices
- * so that each face can be separated from others
- *
- * @author alteredq / http://alteredqualia.com/
- */
-
 import THREE from 'three';
 import calculateCentroid from './utils/centeroid';
 
@@ -17,69 +10,48 @@ export default function explodeModifier(geometry) {
     const vertices = [];
     const faces = [];
     const uv = [];
-    const facesLen = geometry.faces.length;
+    const g = geometry;
 
-    for (let i = 1; i < facesLen; i++) {
+    for (let i = 0, il = geometry.faces.length; i < il; i++) {
         const n = vertices.length;
-        const face = geometry.faces[i];
+        const face = g.faces[i];
         const { a, b, c } = face;
 
-        const va = geometry.vertices[a];
-        const vb = geometry.vertices[b];
-        const vc = geometry.vertices[c];
+        const va = g.vertices[a];
+        const vb = g.vertices[b];
+        const vc = g.vertices[c];
         const vd = calculateCentroid([va, vb, vc]);
 
-        vertices.push(va.clone());
-        vertices.push(vb.clone());
-        vertices.push(vc.clone());
-        vertices.push(vd);
+        vertices.push(va.clone(), vb.clone(), vc.clone(), vd);
 
         face.a = n;
         face.b = n + 1;
         face.c = n + 2;
 
-        // faces.push(face.clone());
+        // add other faces connect them to our newly created vector
+        const face1 = new THREE.Face3().copy(face);
+        face1.a = n + 3;
+        const face2 = new THREE.Face3().copy(face);
+        face2.b = n + 3;
+        const face3 = new THREE.Face3().copy(face);
+        face3.c = n + 3;
 
-        // add other faces
-        const centerVectorIndex = geometry.faces.length * 4 - 1;
-        const extraFace1 = new THREE.Face3().copy(face);
-        extraFace1.a = centerVectorIndex;
-        const extraFace2 = new THREE.Face3().copy(face);
-        extraFace2.b = centerVectorIndex;
-        const extraFace3 = new THREE.Face3().copy(face);
-        extraFace3.c = centerVectorIndex;
+        faces.push(face1, face2, face3);
 
-        const extraFace4 = new THREE.Face3().copy(face);
-        extraFace4.a = i * 4 - 1;
-        const extraFace5 = new THREE.Face3().copy(face);
-        extraFace5.b = i * 4 - 1;
-        const extraFace6 = new THREE.Face3().copy(face);
-        extraFace6.c = i * 4 - 1;
+        // adds uvs to avoid uv error
+        const vuv = [];
+        vuv.push(
+            g.faceVertexUvs[0][i][0],
+            g.faceVertexUvs[0][i][1],
+            g.faceVertexUvs[0][i][2]);
 
-        faces.push(extraFace1,
-            extraFace2,
-            extraFace3,
-            extraFace4,
-            extraFace5,
-            extraFace6
-        );
-
-
-        // // adds uvs to avoid uv error
-        // const vuv = [];
-        // vuv.push(new THREE.Vector2().copy(geometry.faceVertexUvs[0][i][0]));
-        // vuv.push(new THREE.Vector2().copy(geometry.faceVertexUvs[0][i][1]));
-        // vuv.push(new THREE.Vector2().copy(geometry.faceVertexUvs[0][i][2]));
-        // vuv.push(new THREE.Vector2().copy(geometry.faceVertexUvs[0][i][3]));
-        //
-        // // extra uvs per extra face
-        // uv.push(vuv);
+        // extra uvs per extra face
+        uv.push(vuv, vuv, vuv);
     }
 
-    const newGeom = geometry;
-    newGeom.vertices = vertices;
-    newGeom.vertices[vertices.length - 1] = new THREE.Vector3(0, 0, 0);
-    newGeom.faces = faces;
-    newGeom.faceVertexUvs[0] = uv;
-    return newGeom;
+    g.vertices = vertices;
+    g.vertices[vertices.length - 1] = new THREE.Vector3(0, 0, 0);
+    g.faces = faces;
+    g.faceVertexUvs[0] = uv;
+    return g;
 }
