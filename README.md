@@ -1,14 +1,13 @@
-# Experiment 3
+# Experiment 4
 
 ![alt tag](thumb.jpg)
 
-## The Blob!
-I'm still discovering the infinite applications of the sine wave. This time, applied to a SphereGeometry.  
-A wave is calculated by measuring the distance between each vertex on the sphere and a Vector3 aptly named 'warpVector'.
+## The Spike Ball!
+After some hacking of the Explode Modifier script, I've managed to add three new faces to each face in the Icosahedron Geometry. Connecting them to a vertex positioned in the center of that face and moving them individually enables me to achieve this effect.
 
-Play around with the *size* and *speed* variables and see how it behaves.  
+Play around with the *size* and *speed* variables and see how it behaves.
 
-[Live demo](http://danieldelcore.com/lab/3)
+[Live demo](http://danieldelcore.com/lab/4)
 
 ## Initial setup
 - `npm install --global gulp-cli` : Install gulp globally

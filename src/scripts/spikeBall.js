@@ -1,14 +1,14 @@
 import THREE from 'three';
 import explodeModifier from './explodeModifier';
 
-export default class Blob {
+export default class SpikeBall {
     constructor(gui) {
         this.config = {
             speed: 800,
             radius: 400,
             detail: 4,
             min: 350,
-            max: 100,
+            max: 300,
         };
 
         const geometry = new THREE.IcosahedronGeometry(
@@ -20,9 +20,9 @@ export default class Blob {
         const material = new THREE.MeshPhongMaterial({
             color: 0xffffff,
             specular: 0xffffff,
-            shininess: 30,
-            shading: THREE.FlatShading,
-            // shading: THREE.SmoothShading,
+            shininess: 1,
+            shading: THREE.SmoothShading,
+            // shading: THREE.FlatShading,
             // side: THREE.DoubleSide,
             // wireframe: true,
         });
@@ -46,12 +46,17 @@ export default class Blob {
 
     update(timeStamp) {
         const { speed, min, max } = this.config;
+        const vertices = this.mesh.geometry.vertices;
 
-        for (let i = 0; i < this.mesh.geometry.vertices.length; i += 4) {
+        for (let i = 0; i < vertices.length; i += 4) {
             const wave = min + Math.abs((Math.sin(i + (timeStamp / speed))) * max);
-            const D = this.mesh.geometry.vertices[i + 3];
+            const D = vertices[i + 3];
             D.normalize().multiplyScalar(wave);
         }
+
+        this.mesh.rotation.y += 0.001;
+        this.mesh.rotation.x += 0.003;
+        this.mesh.rotation.z += 0.002;
 
         this.mesh.geometry.verticesNeedUpdate = true;
     }

@@ -3,7 +3,7 @@
 
 import THREE from 'three';
 import dat from 'dat-gui';
-import Blob from './blob';
+import SpikeBall from './spikeBall';
 import bindAll from 'lodash/bindAll';
 
 const gui = new dat.GUI();
@@ -23,7 +23,7 @@ function initGui(main) {
     folder.add(main.conf, 'hemisphereLightIntensity', 0, 10)
         .onChange(c => main.hemisphereLight.intensity = c);
     folder.addColor(main.conf, 'directionalLightColor')
-        .onChange(c => main.directionalLight.color = new THREE.Color(c));
+        .onChange(c => main.directionalLight.groundColor = new THREE.Color(c));
     folder.add(main.conf, 'directionalLightIntensity', 0, 10)
         .onChange(c => main.directionalLight.intensity = c);
 }
@@ -39,7 +39,7 @@ class Main {
             hemisphereLightColor2: 0x4b2ecf,
             hemisphereLightIntensity: 1,
             directionalLightColor: 0xffffff,
-            directionalLightIntensity: 0.1,
+            directionalLightIntensity: 0,
         };
 
         // Renderer
@@ -72,27 +72,29 @@ class Main {
             this.renderer.domElement);
         this.controls.userPan = false;
         this.controls.userPanSpeed = 0.0;
+        this.controls.minDistance = 600.0;
         this.controls.maxDistance = 5000.0;
         this.controls.target.set(0, 0, 0);
 
         // Light
-        this.directionalLight = new THREE.DirectionalLight(
-            this.conf.directionalLightColor,
-            this.conf.directionalLightIntensity);
-        this.directionalLight.position.set(-100, 20, 30);
         this.hemisphereLight = new THREE.HemisphereLight(
             this.conf.hemisphereLightColor,
             this.conf.hemisphereLightColor2,
             this.conf.hemisphereLightIntensity);
         this.hemisphereLight.position.set(-20, 20, 30);
 
+        this.directionalLight = new THREE.DirectionalLight(
+            this.conf.directionalLightColor,
+            this.conf.directionalLightIntensity);
+        this.directionalLight.position.set(-100, 20, 30);
+
         // Pièce de résistance
-        this.blob = new Blob(gui);
+        this.spikeBall = new SpikeBall(gui);
 
         this.scene.add(
-            this.hemisphereLight,
             this.directionalLight,
-            this.blob.mesh);
+            this.hemisphereLight,
+            this.spikeBall.mesh);
     }
 
     onResize() {
@@ -103,7 +105,7 @@ class Main {
     }
 
     render(timeStamp) {
-        if (timeStamp) this.blob.update(timeStamp);
+        if (timeStamp) this.spikeBall.update(timeStamp);
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
